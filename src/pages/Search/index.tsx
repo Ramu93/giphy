@@ -11,7 +11,7 @@ const Search: FC<SearchType> = ({}) => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    navigate(`${paths.RESULTS}/${searchValue}`);
+    navigate(`${paths.RESULTS}/${searchValue.trim()}`);
   };
 
   return (
