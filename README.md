@@ -4,7 +4,11 @@ This is a web app build using React that that mocks [Giphy](https://giphy.com/) 
 
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory, you please run:
+
+### `npm install`
+
+Installs the required dependencies.
 
 ### `npm start`
 
