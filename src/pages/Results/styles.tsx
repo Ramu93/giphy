@@ -89,3 +89,13 @@ export const StickyContainer = styled.div`
 export const Column = styled.div`
   padding: 0.2em 0.2em;
 `;
+
+export const NoData = styled.div`
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: ${theme.primary};
+`;

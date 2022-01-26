@@ -5,6 +5,7 @@ import {
   ResultsContainer,
   StickyContainer,
   Column,
+  NoData,
 } from "./styles";
 import SearchBox from "../../components/SearchBox";
 import { search } from "../../services/search";
@@ -22,34 +23,34 @@ const Results: FC<ResultsProps> = ({}) => {
   const [offset, setOffset] = useState<number>(0);
   const [results, setResults] = useState<ResultData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [fetchCount, setFetchCount] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<ResultData>();
+  const [hasNoData, setHasNoData] = useState<boolean>(false);
   const loader = useRef(null);
 
   const params = useParams();
   const navigate = useNavigate();
 
   const handleSearch = () => {
+    // reset state on new search
     setOffset(0);
-    setFetchCount(0);
     setTotalCount(0);
     setResults([]);
     setQuery(searchValue);
+    setHasNoData(false);
     navigate(`/results/${searchValue}`);
   };
 
   const fetchResults = async () => {
-    if (searchValue !== "" && (totalCount === 0 || fetchCount < totalCount)) {
+    if (totalCount === 0 || offset < totalCount) {
       setIsLoading(true);
-      const response: ResultsResponse = await search(query, offset);
-      setFetchCount(fetchCount + 1);
+      const response: ResultsResponse = await search(query.trim(), offset);
+      if (response.totalCount === 0) {
+        setHasNoData(true);
+      }
       setTotalCount(response.totalCount);
-      const updatedResults = [...results, ...response.data];
-
-      setResults(updatedResults);
-      setFetchCount(updatedResults.length);
+      setResults([...results, ...response.data]);
       setIsLoading(false);
       setOffset(offset + response.count);
     }
@@ -66,11 +67,11 @@ const Results: FC<ResultsProps> = ({}) => {
   const fetchMore = useCallback(
     (entries) => {
       const target = entries[0];
-      if (target.isIntersecting) {
+      if (target.isIntersecting && !hasNoData) {
         !isLoading && fetchResults();
       }
     },
-    [query, offset, isLoading, results]
+    [query, offset, isLoading, hasNoData]
   );
 
   // side effect taking care of pagination - lazy loading of the results
@@ -122,6 +123,7 @@ const Results: FC<ResultsProps> = ({}) => {
           </Column>
         ))}
       </ResultsContainer>
+      {hasNoData && <NoData>No results matching your query.</NoData>}
       <LoaderContainer ref={loader}>{isLoading && <Loader />}</LoaderContainer>
       <Modal
         visible={isModalVisible}

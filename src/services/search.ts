@@ -23,8 +23,12 @@ export async function search(
 
   try {
     const fullResponse: Result = await get(url);
-    response.count = fullResponse.pagination.count;
-    response.totalCount = fullResponse.pagination.total_count;
+    response.count = 0;
+    response.totalCount = 0;
+    if (fullResponse.pagination) {
+      response.count = fullResponse.pagination.count;
+      response.totalCount = fullResponse.pagination.total_count;
+    }
     response.data = fullResponse.data;
   } catch (error) {
     console.error(error);
